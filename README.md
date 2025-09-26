@@ -1,6 +1,6 @@
 # Dotfiles
 
-Personal dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/).
+Cross-platform dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/), supporting both macOS and Linux.
 
 ## Installation
 
@@ -16,6 +16,9 @@ apt-get install stow
 
 # Linux (Fedora)
 dnf install stow
+
+# Linux (Arch)
+pacman -S stow
 ```
 
 ### Setup
@@ -26,89 +29,125 @@ git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 ```
 
-2. Create symlinks:
+2. Stow platform-specific configurations:
+
+**For macOS:**
 ```bash
-stow .
+stow mac
 ```
 
-That's it! All dotfiles are now symlinked to your home directory.
+**For Linux:**
+```bash
+stow linux
+```
+
+## Structure
+
+```
+dotfiles/
+├── mac/                 # macOS-specific dotfiles
+│   ├── .alacritty.toml
+│   ├── .bashrc
+│   ├── .bash_profile
+│   ├── .bash_aliases
+│   ├── .gitconfig
+│   └── .gitignore_global
+├── linux/               # Linux-specific dotfiles
+│   ├── .alacritty.toml
+│   ├── .bashrc
+│   ├── .bash_aliases
+│   ├── .gitconfig
+│   └── .gitignore_global
+├── scripts/             # Helper scripts
+├── README.md
+└── CLAUDE.md
+```
 
 ## Usage
 
 ### Managing Dotfiles
 
 ```bash
-# Create all symlinks
-stow .
+# Stow platform configs
+stow mac      # macOS
+stow linux    # Linux
 
-# Remove all symlinks
-stow -D .
+# Remove symlinks
+stow -D mac
+stow -D linux
 
-# Restow (refresh) all symlinks
-stow --restow .
+# Restow (refresh) symlinks
+stow --restow mac
+stow --restow linux
 
 # Dry run (preview changes)
-stow -n -v .
+stow -n -v mac
+stow -n -v linux
 
-# Adopt existing files into repo
-stow --adopt .
+# Adopt existing files
+stow --adopt mac
+stow --adopt linux
 ```
 
 ### Adding New Dotfiles
 
-1. Copy your dotfile to the repository:
+**For macOS:**
 ```bash
-cp ~/.vimrc ~/dotfiles/.vimrc
-```
-
-2. Restow to create symlink:
-```bash
+cp ~/.vimrc ~/dotfiles/mac/.vimrc
 cd ~/dotfiles
-stow --restow .
+stow --restow mac
 ```
 
-3. Commit changes:
+**For Linux:**
 ```bash
-git add .vimrc
-git commit -m "Add .vimrc"
+cp ~/.vimrc ~/dotfiles/linux/.vimrc
+cd ~/dotfiles
+stow --restow linux
 ```
 
-## Structure
+### Automatic Platform Detection
 
-All dotfiles are placed directly in the repository root:
+```bash
+# Install based on detected OS
+cd ~/dotfiles
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    stow mac
+else
+    stow linux
+fi
+```
 
-```
-dotfiles/
-├── .alacritty.toml
-├── .bashrc
-├── .bash_profile
-├── .bash_aliases
-├── .gitconfig
-├── .gitignore_global
-├── scripts/         # Helper scripts (not stowed)
-├── README.md        # This file (not stowed)
-└── CLAUDE.md        # AI instructions (not stowed)
-```
+## Platform Differences
+
+### macOS (`mac/`)
+- Includes `.bash_profile` for Terminal.app compatibility
+- Homebrew configuration in `.bashrc`
+- macOS-specific color settings
+
+### Linux (`linux/`)
+- No `.bash_profile` (uses `.bashrc` directly)
+- Linux-specific color support with dircolors
+- No Homebrew configuration
 
 ## Troubleshooting
 
 ### Check for conflicts
 ```bash
-stow -n -v . 2>&1 | grep -E 'CONFLICT|WARNING'
+stow -n -v mac 2>&1 | grep -E 'CONFLICT|WARNING'
+stow -n -v linux 2>&1 | grep -E 'CONFLICT|WARNING'
 ```
 
 ### Force adoption of existing files
 ```bash
-stow --adopt .
+stow --adopt mac    # macOS
+stow --adopt linux  # Linux
 ```
 
 ### Clean and restow
 ```bash
-stow -D . && stow .
+# macOS
+stow -D mac && stow mac
+
+# Linux
+stow -D linux && stow linux
 ```
-
-## Notes
-
-- Dotfiles are symlinked directly from the repository root to `~`
-- Non-dotfiles (README, scripts, etc.) are automatically ignored by Stow
-- Use `.stow-local-ignore` to exclude additional files if needed

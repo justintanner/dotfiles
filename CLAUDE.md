@@ -4,85 +4,113 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-Personal dotfiles repository managed with GNU Stow. All configuration files are placed directly in the repository root and stowed to the home directory.
+Cross-platform dotfiles repository managed with GNU Stow, supporting both macOS and Linux with platform-specific directories.
 
 ## GNU Stow Commands
 
-### Basic Usage
+### Platform-Specific Installation
 
 ```bash
 # Navigate to dotfiles directory
 cd ~/dotfiles
 
-# Create all symlinks
-stow .
+# For macOS
+stow mac
 
-# Remove all symlinks
-stow -D .
+# For Linux
+stow linux
 
-# Restow (refresh) all symlinks
-stow --restow .
+# Remove symlinks
+stow -D mac    # macOS
+stow -D linux  # Linux
+
+# Restow (refresh) symlinks
+stow --restow mac    # macOS
+stow --restow linux  # Linux
 ```
 
 ### Advanced Options
 
 ```bash
-# Dry run (preview changes without making them)
-stow -n -v .
+# Dry run (preview changes)
+stow -n -v mac
+stow -n -v linux
 
-# Verbose output (see what's being linked)
-stow -v .
+# Verbose output
+stow -v mac
+stow -v linux
 
-# Adopt existing files (move them into dotfiles)
-stow --adopt .
-
-# Ignore specific patterns
-stow --ignore='scripts|README|CLAUDE' .
+# Adopt existing files
+stow --adopt mac
+stow --adopt linux
 ```
 
 ## Repository Structure
 
 ```
 ~/dotfiles/
-├── .alacritty.toml   → ~/.alacritty.toml
-├── .bashrc           → ~/.bashrc
-├── .bash_profile     → ~/.bash_profile
-├── .bash_aliases     → ~/.bash_aliases
-├── .gitconfig        → ~/.gitconfig
-├── .gitignore_global → ~/.gitignore_global
-├── scripts/          (not stowed)
-├── README.md         (not stowed)
-└── CLAUDE.md         (not stowed)
+├── mac/                      # macOS-specific dotfiles
+│   ├── .alacritty.toml      → ~/.alacritty.toml
+│   ├── .bashrc              → ~/.bashrc
+│   ├── .bash_profile        → ~/.bash_profile
+│   ├── .bash_aliases        → ~/.bash_aliases
+│   ├── .gitconfig           → ~/.gitconfig
+│   └── .gitignore_global    → ~/.gitignore_global
+├── linux/                    # Linux-specific dotfiles
+│   ├── .alacritty.toml      → ~/.alacritty.toml
+│   ├── .bashrc              → ~/.bashrc
+│   ├── .bash_aliases        → ~/.bash_aliases
+│   ├── .gitconfig           → ~/.gitconfig
+│   └── .gitignore_global    → ~/.gitignore_global
+├── scripts/                  # Helper scripts (not stowed)
+├── README.md                 # Documentation (not stowed)
+└── CLAUDE.md                 # This file (not stowed)
 ```
+
+## Platform Differences
+
+### macOS Directory (`mac/`)
+- Contains `.bash_profile` for Terminal.app
+- `.bashrc` includes Homebrew configuration
+- Uses macOS-specific `LSCOLORS`
+
+### Linux Directory (`linux/`)
+- No `.bash_profile` (most Linux systems use `.bashrc` directly)
+- `.bashrc` uses dircolors for color support
+- No Homebrew references
 
 ## Adding New Dotfiles
 
-1. Place the dotfile directly in `~/dotfiles/`:
+### For macOS
 ```bash
-cp ~/.vimrc ~/dotfiles/.vimrc
+cp ~/.newconfig ~/dotfiles/mac/.newconfig
+cd ~/dotfiles
+stow --restow mac
 ```
 
-2. Stow to create the symlink:
+### For Linux
+```bash
+cp ~/.newconfig ~/dotfiles/linux/.newconfig
+cd ~/dotfiles
+stow --restow linux
+```
+
+## Automatic Platform Detection
+
+Use this snippet for automatic platform detection:
 ```bash
 cd ~/dotfiles
-stow .
-```
-
-## Excluding Files from Stowing
-
-Create a `.stow-local-ignore` file to exclude files:
-```
-# Exclude documentation and scripts
-README.*
-CLAUDE.*
-scripts
-\.git
-\.idea
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    stow mac
+else
+    stow linux
+fi
 ```
 
 ## Best Practices
 
-- Keep all dotfiles in the repository root
-- Use `.stow-local-ignore` to exclude non-dotfiles
-- Run `stow -n .` to preview changes before applying
-- Use `stow --adopt .` to incorporate existing dotfiles
+- Keep platform-specific configurations separate
+- Test changes with `stow -n` before applying
+- Use `stow --adopt` to incorporate existing dotfiles
+- Maintain parity between platforms where possible
+- Document platform-specific differences clearly
