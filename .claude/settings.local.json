@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//Users/jwt/.config/**)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

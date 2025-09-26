@@ -4,53 +4,85 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Repository Overview
 
-This is a personal dotfiles repository for macOS, managed with GNU Stow for symlink management. The dotfiles are organized in a modular package structure where each tool has its own directory.
+Personal dotfiles repository managed with GNU Stow. All configuration files are placed directly in the repository root and stowed to the home directory.
 
-## Commands
+## GNU Stow Commands
 
-### Installation and Setup
+### Basic Usage
+
 ```bash
-# Full installation (installs Homebrew packages and creates symlinks)
-./install.sh
-
-# Manual symlink management with Stow
+# Navigate to dotfiles directory
 cd ~/dotfiles
-stow alacritty    # Symlink Alacritty config
-stow bash         # Symlink Bash configs
-stow git          # Symlink Git configs
-stow --restow alacritty bash git  # Re-stow all packages
 
-# Remove symlinks
-stow -D alacritty
-stow -D bash
-stow -D git
+# Create all symlinks
+stow .
+
+# Remove all symlinks
+stow -D .
+
+# Restow (refresh) all symlinks
+stow --restow .
 ```
 
-### Adding New Packages
+### Advanced Options
+
 ```bash
-# Create new package directory following home directory structure
-mkdir -p ~/dotfiles/package-name
-# For ~/.config/app/config:
-mkdir -p ~/dotfiles/app/.config/app
-# Then stow the package
-stow app
+# Dry run (preview changes without making them)
+stow -n -v .
+
+# Verbose output (see what's being linked)
+stow -v .
+
+# Adopt existing files (move them into dotfiles)
+stow --adopt .
+
+# Ignore specific patterns
+stow --ignore='scripts|README|CLAUDE' .
 ```
 
-## Architecture
+## Repository Structure
 
-The repository uses GNU Stow to manage symlinks. Each package directory mirrors the home directory structure:
-- Files in `bash/` like `.bashrc` get symlinked to `~/.bashrc`
-- Files in `alacritty/` like `.alacritty.toml` get symlinked to `~/.alacritty.toml`
-- Nested structures are preserved (e.g., `mise/.config/mise/` → `~/.config/mise/`)
+```
+~/dotfiles/
+├── .alacritty.toml   → ~/.alacritty.toml
+├── .bashrc           → ~/.bashrc
+├── .bash_profile     → ~/.bash_profile
+├── .bash_aliases     → ~/.bash_aliases
+├── .gitconfig        → ~/.gitconfig
+├── .gitignore_global → ~/.gitignore_global
+├── scripts/          (not stowed)
+├── README.md         (not stowed)
+└── CLAUDE.md         (not stowed)
+```
 
-Key components:
-- **install.sh**: Automated installer that installs Homebrew, essential packages, and runs Stow
-- **Package directories**: Each tool has its own directory with configs that mirror the home directory structure
-- **Local customization**: Supports `~/.bashrc.local` for machine-specific configurations not tracked in git
+## Adding New Dotfiles
 
-## Important Notes
+1. Place the dotfile directly in `~/dotfiles/`:
+```bash
+cp ~/.vimrc ~/dotfiles/.vimrc
+```
 
-- This is a macOS-specific configuration (installer checks for Darwin)
-- The installer backs up existing dotfiles to `~/.dotfiles_backup/` before creating symlinks
-- Homebrew packages are automatically installed including: stow, bash, mise, alacritty, bat, eza, ripgrep, fd, gh, jq
-- Custom scripts can be added to the `bin/` directory which is automatically added to PATH via `.bashrc`
+2. Stow to create the symlink:
+```bash
+cd ~/dotfiles
+stow .
+```
+
+## Excluding Files from Stowing
+
+Create a `.stow-local-ignore` file to exclude files:
+```
+# Exclude documentation and scripts
+README.*
+CLAUDE.*
+scripts
+\.git
+\.idea
+```
+
+## Best Practices
+
+- Keep all dotfiles in the repository root
+- Use `.stow-local-ignore` to exclude non-dotfiles
+- Run `stow -n .` to preview changes before applying
+- Use `stow --adopt .` to incorporate existing dotfiles
