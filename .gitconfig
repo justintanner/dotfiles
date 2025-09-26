@@ -1,0 +1,29 @@
+[core]
+    editor = emacs
+    autocrlf = input
+    whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
+    excludesfile = ~/.gitignore_global
+    pager = less -FRX
+
+[color]
+    ui = auto
+    diff = auto
+    status = auto
+    branch = auto
+    interactive = auto
+
+[push]
+    default = current
+    autoSetupRemote = true
+
+[pull]
+    rebase = true
+
+[init]
+    defaultBranch = main
+
+[fetch]
+    prune = true
+
+[rebase]
+    autoStash = true
