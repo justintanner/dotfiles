@@ -1,0 +1,53 @@
+[window.padding]
+x = 4
+y = 4
+
+[terminal.shell]
+program = "/opt/homebrew/bin/bash"
+args = ["-l"]
+
+[window]
+option_as_alt = "OnlyLeft"
+startup_mode = "Maximized"
+
+[[mouse.bindings]]
+mouse = "Right"
+action = "Paste"
+
+[selection]
+save_to_clipboard = true
+
+[font.normal]
+family = "JetBrainsMono Nerd Font"
+
+[font]
+size = 13
+
+# Colors (Dark theme)
+[colors.primary]
+background = '#1e1e1e'
+foreground = '#d4d4d4'
+
+[colors.cursor]
+text = '#1e1e1e'
+cursor = '#d4d4d4'
+
+[colors.normal]
+black   = '#1e1e1e'
+red     = '#f44747'
+green   = '#608b4e'
+yellow  = '#dcdcaa'
+blue    = '#569cd6'
+magenta = '#c678dd'
+cyan    = '#56b6c2'
+white   = '#d4d4d4'
+
+[colors.bright]
+black   = '#545454'
+red     = '#f44747'
+green   = '#608b4e'
+yellow  = '#dcdcaa'
+blue    = '#569cd6'
+magenta = '#c678dd'
+cyan    = '#56b6c2'
+white   = '#e5e5e5'
