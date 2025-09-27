@@ -6,7 +6,8 @@
       "Read(//Users/jwt/rails-academy/mac/**)",
       "Read(//Users/jwt/rails-academy/common/**)",
       "Read(//Users/jwt/rails-academy/**)",
-      "Read(//Users/jwt/**)"
+      "Read(//Users/jwt/**)",
+      "WebFetch(domain:catppuccin.com)"
     ],
     "deny": [],
     "ask": []
