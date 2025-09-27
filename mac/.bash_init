@@ -48,9 +48,6 @@ fi
 # Add local bins to path
 export PATH="./bin:~/.local/bin:$PATH"
 
-# Add scripts directory to PATH
-export PATH="~/scripts:$PATH"
-
 # -----------------------------------------------------------------------------
 # Environment Variables
 # -----------------------------------------------------------------------------
