@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+
+# =============================================================================
+# Bash Initialization - Advanced Configuration
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# History Configuration
+# -----------------------------------------------------------------------------
+shopt -s histappend
+HISTCONTROL=ignoreboth
+HISTSIZE=32768
+HISTFILESIZE="${HISTSIZE}"
+
+# -----------------------------------------------------------------------------
+# macOS Specific Settings
+# -----------------------------------------------------------------------------
+# Suppress the macOS zsh conversion warning
+export BASH_SILENCE_DEPRECATION_WARNING=1
+
+# Add Homebrew to the path
+export PATH="$PATH:/usr/local/bin:/usr/local/sbin:/opt/homebrew/bin:/opt/homebrew/sbin"
+
+# MySQL client build support
+if [ -d "/opt/homebrew/opt/mysql-client" ]; then
+  export PATH="$PATH:/opt/homebrew/opt/mysql-client/bin"
+  export LDFLAGS="$LDFLAGS -L/opt/homebrew/opt/mysql-client/lib"
+  export CPPFLAGS="$CPPFLAGS -I/opt/homebrew/opt/mysql-client/include"
+  export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/opt/homebrew/opt/mysql-client/lib/pkgconfig"
+fi
+
+# PostgreSQL (libpq) build support
+if [ -d "/opt/homebrew/opt/libpq" ]; then
+  export PATH="$PATH:/opt/homebrew/opt/libpq/bin"
+  export LDFLAGS="$LDFLAGS -L/opt/homebrew/opt/libpq/lib"
+  export CPPFLAGS="$CPPFLAGS -I/opt/homebrew/opt/libpq/include"
+  export PKG_CONFIG_PATH="$PKG_CONFIG_PATH:/opt/homebrew/opt/libpq/lib/pkgconfig"
+fi
+
+# Terraform completion
+if command -v terraform &> /dev/null; then
+   complete -C /opt/homebrew/bin/terraform terraform
+fi
+
+# -----------------------------------------------------------------------------
+# Path Configuration
+# -----------------------------------------------------------------------------
+# Add local bins to path
+export PATH="./bin:~/.local/bin:$PATH"
+
+# Add scripts directory to PATH
+export PATH="~/scripts:$PATH"
+
+# -----------------------------------------------------------------------------
+# Environment Variables
+# -----------------------------------------------------------------------------
+# Tell Mise to automatically load .env files
+export MISE_ENV_FILE=.env
+
+# Color support
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+
+# -----------------------------------------------------------------------------
+# Tool Initializations
+# -----------------------------------------------------------------------------
+# Mise (formerly rtx)
+if command -v mise &> /dev/null; then
+  eval "$(mise activate bash)"
+fi
+
+# Zoxide - smart directory jumping
+if command -v zoxide &> /dev/null; then
+  eval "$(zoxide init bash)"
+else
+  # If zoxide is not installed, make sure cd alias doesn't break
+  unalias cd 2>/dev/null || true
+fi
+
+# FZF - fuzzy finder
+if command -v fzf &> /dev/null; then
+  eval "$(fzf --bash)"
+fi
+
+# -----------------------------------------------------------------------------
+# Bash Completion
+# -----------------------------------------------------------------------------
+[[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"
+
+# -----------------------------------------------------------------------------
+# Prompt Configuration
+# -----------------------------------------------------------------------------
+force_color_prompt=yes
+color_prompt=yes
+
+# Simple fallback prompt
+PS1='$ '
+
+eval "$(oh-my-posh init bash --config $HOME/.config/ohmyposh/zen.toml)"
+
+# -----------------------------------------------------------------------------
+# Load inputrc if it exists
+# -----------------------------------------------------------------------------
+if [ -f ~/.inputrc ]; then
+  bind -f ~/.inputrc
+fi

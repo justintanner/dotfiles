@@ -1,0 +1,61 @@
+schema = 'https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json'
+version = 3
+final_space = true
+
+[palette]
+os = '#ACB0BE'
+closer = 'p:os'
+pink = '#ea76cb'
+lavender = '#7287FD'
+blue = '#1e66f5'
+
+[[blocks]]
+type = 'prompt'
+alignment = 'left'
+
+# OS Icon
+[[blocks.segments]]
+type = 'os'
+style = 'plain'
+foreground = 'p:os'
+template = '{{.Icon}} '
+
+# Username@Hostname
+[[blocks.segments]]
+type = 'session'
+style = 'plain'
+foreground = 'p:blue'
+template = '{{ .UserName }}@{{ .HostName }} '
+
+# Current Path
+[[blocks.segments]]
+type = 'path'
+style = 'plain'
+foreground = 'p:pink'
+template = '{{ .Path }} '
+[blocks.segments.properties]
+folder_icon = '..'
+home_icon = '~'
+style = 'agnoster_short'
+
+# Git Branch
+[[blocks.segments]]
+type = 'git'
+style = 'plain'
+foreground = 'p:lavender'
+template = 'git:{{ .HEAD }} '
+[blocks.segments.properties]
+branch_icon = ''
+fetch_status = false
+fetch_upstream_icon = false
+
+[[blocks]]
+type = 'prompt'
+alignment = 'left'
+newline = true  # <== SECOND LINE PROMPT
+
+[[blocks.segments]]
+type = 'text'
+style = 'plain'
+foreground = 'p:closer'
+template = '> '

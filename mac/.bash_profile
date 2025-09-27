@@ -1,6 +1,3 @@
-#!/usr/bin/env bash
-
-# Source .bashrc if it exists
-if [[ -f "$HOME/.bashrc" ]]; then
-    source "$HOME/.bashrc"
+if [ -f ~/.bashrc ]; then
+    source ~/.bashrc
 fi

@@ -1,29 +1,26 @@
-#!/usr/bin/env bash
+# File system
+alias ls='eza -lh --group-directories-first --icons'
+alias lsa='ls -a'
+alias lt='eza --tree --level=2 --long --icons --git'
+alias lta='lt -a'
+alias ff="fzf --preview 'bat --style=numbers --color=always {}'"
 
-# Aliases
-alias ls='ls -G'
-alias ll='ls -alF'
-alias la='ls -A'
-alias l='ls -CF'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias grep='grep --color=auto'
-alias fgrep='fgrep --color=auto'
-alias egrep='egrep --color=auto'
+# Tools
+alias n='nvim'
+alias e='emacs'
+alias g='git'
+alias d='docker'
+alias r='rails'
+alias lzg='lazygit'
+alias lzd='lazydocker'
 
-# Git aliases
-alias gs='git status'
-alias ga='git add'
-alias gc='git commit'
-alias gp='git push'
-alias gl='git log --oneline --graph --decorate'
-alias gd='git diff'
-alias gb='git branch'
-alias gco='git checkout'
+# Git shortcuts
+alias gcm='git commit -m'
+alias gcam='git commit -a -m'
+alias gcad='git commit -a --amend'
+alias gcbr='git checkout -b'
+alias gpfo='git push --force'
 
-# Development aliases
-alias be='bundle exec'
-alias bi='bundle install'
-alias rs='rails server'
-alias rc='rails console'
-alias rdb='rails db:migrate'
+# Compression
+compress() { tar -czf "${1%/}.tar.gz" "${1%/}"; }
+alias decompress="tar -xzf"

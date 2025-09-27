@@ -1,29 +1,16 @@
+[user]
+	email = work@jwtanner.com
+	name = Justin Tanner
 [core]
-    editor = emacs
-    autocrlf = input
-    whitespace = fix,-indent-with-non-tab,trailing-space,cr-at-eol
-    excludesfile = ~/.gitignore_global
-    pager = less -FRX
-
-[color]
-    ui = auto
-    diff = auto
-    status = auto
-    branch = auto
-    interactive = auto
-
-[push]
-    default = current
-    autoSetupRemote = true
-
+	editor = emacs
+	autocrlf = input
+	excludesfile = /Users/jwt/.gitignore_global
+[alias]
+	co = checkout
+	br = branch
+	ci = commit
+	st = status
 [pull]
-    rebase = true
-
-[init]
-    defaultBranch = main
-
-[fetch]
-    prune = true
-
-[rebase]
-    autoStash = true
+	rebase = true
+[push]
+	autoSetupRemote = true

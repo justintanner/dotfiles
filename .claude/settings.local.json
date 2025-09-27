@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Read(//Users/jwt/.config/**)",
-      "Bash(xargs:*)"
+      "Bash(xargs:*)",
+      "Read(//Users/jwt/rails-academy/mac/**)",
+      "Read(//Users/jwt/rails-academy/common/**)",
+      "Read(//Users/jwt/rails-academy/**)",
+      "Read(//Users/jwt/**)"
     ],
     "deny": [],
     "ask": []
