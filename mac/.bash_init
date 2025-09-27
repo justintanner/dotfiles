@@ -18,8 +18,8 @@ HISTFILESIZE="${HISTSIZE}"
 # Suppress the macOS zsh conversion warning
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
-# Add Homebrew to the path
-export PATH="$PATH:/usr/local/bin:/usr/local/sbin:/opt/homebrew/bin:/opt/homebrew/sbin"
+# Add Homebrew to the path (before system paths for newer versions)
+export PATH="/usr/local/bin:/usr/local/sbin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
 
 # MySQL client build support
 if [ -d "/opt/homebrew/opt/mysql-client" ]; then
@@ -101,6 +101,7 @@ eval "$(oh-my-posh init bash --config $HOME/.config/ohmyposh/zen.toml)"
 # -----------------------------------------------------------------------------
 # Load inputrc if it exists
 # -----------------------------------------------------------------------------
-if [ -f ~/.inputrc ]; then
+# Only bind in interactive shells to avoid "line editing not enabled" warning
+if [[ $- == *i* ]] && [ -f ~/.inputrc ]; then
   bind -f ~/.inputrc
 fi
