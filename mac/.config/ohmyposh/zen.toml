@@ -36,14 +36,7 @@ closer = 'p:surface2'
 [[blocks]]
 type = 'prompt'
 alignment = 'left'
-
-# OS Icon
-[[blocks.segments]]
-type = 'os'
-style = 'plain'
-foreground = 'p:os'
-template = '{{.Icon}} '
-
+newline = true
 
 # Current Path
 [[blocks.segments]]
@@ -70,10 +63,10 @@ fetch_upstream_icon = false
 [[blocks]]
 type = 'prompt'
 alignment = 'left'
-newline = true  # <== SECOND LINE PROMPT
+newline = true
 
 [[blocks.segments]]
 type = 'text'
 style = 'plain'
 foreground = 'p:closer'
-template = '> '
+template = '>'
