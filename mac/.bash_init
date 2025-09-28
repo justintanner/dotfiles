@@ -93,7 +93,10 @@ color_prompt=yes
 # Simple fallback prompt
 PS1='$ '
 
-eval "$(oh-my-posh init bash --config $HOME/.config/ohmyposh/zen.toml)"
+# Conditional prompt based on Bash version
+if ((${BASH_VERSION%%.*} > 4)); then
+    eval "$(oh-my-posh init bash --config $HOME/.config/ohmyposh/zen.toml)"
+fi
 
 # -----------------------------------------------------------------------------
 # Load inputrc if it exists
