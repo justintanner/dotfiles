@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+# =============================================================================
+# Bash Initialization - Advanced Configuration
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# History Configuration
+# -----------------------------------------------------------------------------
+shopt -s histappend
+HISTCONTROL=ignoreboth
+HISTSIZE=32768
+HISTFILESIZE="${HISTSIZE}"
+
+# -----------------------------------------------------------------------------
+# Path Configuration
+# -----------------------------------------------------------------------------
+# Add local bins to path
+export PATH="./bin:~/.local/bin:$PATH"
+
+# -----------------------------------------------------------------------------
+# Environment Variables
+# -----------------------------------------------------------------------------
+# Tell Mise to automatically load .env files
+export MISE_ENV_FILE=.env
+
+# Color support
+export CLICOLOR=1
+export LSCOLORS=GxFxCxDxBxegedabagaced
+
+# -----------------------------------------------------------------------------
+# Tool Initializations
+# -----------------------------------------------------------------------------
+# Mise (formerly rtx)
+if command -v mise &> /dev/null; then
+  eval "$(mise activate bash)"
+fi
+
+# Zoxide - smart directory jumping
+if command -v zoxide &> /dev/null; then
+  eval "$(zoxide init bash)"
+else
+  # If zoxide is not installed, make sure cd alias doesn't break
+  unalias cd 2>/dev/null || true
+fi
+
+# FZF - fuzzy finder
+if command -v fzf &> /dev/null; then
+  eval "$(fzf --bash)"
+fi
+
+# -----------------------------------------------------------------------------
+# Bash Completion
+# -----------------------------------------------------------------------------
+[[ -r "/opt/homebrew/etc/profile.d/bash_completion.sh" ]] && . "/opt/homebrew/etc/profile.d/bash_completion.sh"
+
+# -----------------------------------------------------------------------------
+# Prompt Configuration
+# -----------------------------------------------------------------------------
+force_color_prompt=yes
+color_prompt=yes
+
+# Simple fallback prompt
+PS1='$ '
+
+# Conditional prompt based on Bash version
+if ((${BASH_VERSION%%.*} > 4)); then
+    eval "$(oh-my-posh init bash --config $HOME/.config/ohmyposh/zen.toml)"
+fi
+
+# -----------------------------------------------------------------------------
+# Load inputrc if it exists
+# -----------------------------------------------------------------------------
+# Only bind in interactive shells to avoid "line editing not enabled" warning
+if [[ $- == *i* ]] && [ -f ~/.inputrc ]; then
+  bind -f ~/.inputrc
+fi

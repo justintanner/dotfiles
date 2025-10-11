@@ -1,0 +1,15 @@
+.git
+.github
+*.md
+README.md
+CLAUDE.md
+mac/
+scripts/
+.DS_Store
+*.swp
+*.swo
+*~
+.dockerignore
+docker-compose.yml
+test-dotfiles.sh
+build.sh
