@@ -69,6 +69,48 @@ aren't auto-installed — Terminal/iTerm own their preference stores.
 Regenerate after palette tweaks with
 `swift scripts/generate-mac-themes.swift`.
 
+## Raspberry Pi
+
+Raspberry Pi OS is Debian — `install.sh` detects Linux and copies the
+`linux/` tree into `$HOME`, then clones `~/.emacs.d`. From a fresh image:
+
+```bash
+sudo apt install -y git
+git clone https://github.com/justintanner/dotfiles.git ~/dotfiles
+~/dotfiles/scripts/install.sh
+exec bash -l   # pick up the new .bash_init
+```
+
+The shipped `.bash_init` no-ops gracefully when optional tools aren't on
+`$PATH` — install whichever you want:
+
+```bash
+sudo apt install -y fzf                                # fuzzy finder
+curl https://mise.run | sh                             # mise (runtimes)
+curl -s https://ohmyposh.dev/install.sh | sudo bash -s # prompt
+```
+
+For the full Gas City look on a **desktop** Pi:
+
+```bash
+sudo apt install -y alacritty emacs
+
+# JetBrainsMono Nerd Font (referenced by linux/.alacritty.toml)
+mkdir -p ~/.local/share/fonts && cd ~/.local/share/fonts
+curl -L -o JetBrainsMono.zip \
+  https://github.com/ryanoasis/nerd-fonts/releases/latest/download/JetBrainsMono.zip
+unzip -o JetBrainsMono.zip && rm JetBrainsMono.zip && fc-cache -f
+```
+
+Notes:
+
+- `linux/.alacritty.toml` ships `font.size = 19` (vs 18 on Mac) for
+  higher-DPI Pi displays — tweak if your monitor disagrees.
+- Pi 4 / Pi 5 are arm64; mise, oh-my-posh, alacritty, and the nerd font
+  all publish arm64 builds.
+- Headless / SSH-only? Skip the desktop block — the shell config, mise,
+  fzf, and `~/.emacs.d` (terminal Emacs) are all you need.
+
 ## Why not GNU Stow / symlinks?
 
 Symlinking `~/.bashrc` into the repo means every local edit (PATH for a new

@@ -3,7 +3,7 @@ x = 10
 y = 10
 
 [terminal.shell]
-program = "/opt/homebrew/bin/bash"
+program = "/bin/bash"
 args = ["-l", "-c", "set -o ignoreeof; exec bash"]
 
 [window]
@@ -52,7 +52,7 @@ background = "#e0a060"
 
 [colors.footer_bar]
 foreground = "#e8d4a8"
-background = "#3d2e20"
+background = "#50382a"
 
 [colors.hints.start]
 foreground = "#1e150e"
@@ -60,14 +60,14 @@ background = "#e08652"
 
 [colors.hints.end]
 foreground = "#e8d4a8"
-background = "#3d2e20"
+background = "#50382a"
 
 [colors.selection]
 text = "#e8d4a8"
 background = "#4a3520"
 
 [colors.normal]
-black = "#2a1f15"
+black = "#3a2a1c"
 red = "#cc6e3a"
 green = "#8a9a5b"
 yellow = "#e0a060"
@@ -77,7 +77,7 @@ cyan = "#7fa9a9"
 white = "#e8d4a8"
 
 [colors.bright]
-black = "#3d2e20"
+black = "#50382a"
 red = "#e08652"
 green = "#a8b878"
 yellow = "#f0b870"
