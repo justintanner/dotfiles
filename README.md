@@ -35,6 +35,23 @@ LLM editing your shell config) to drop machine-specific PATH entries,
 exports, and secrets into. The repo's `mac/.bashrc` template ships with
 those sections empty — your real `~/.bashrc` is never tracked.
 
+## Themes
+
+Default look is **Gas City** — a warm-dark palette (walnut bg, champagne fg,
+copper/honey/sage accents). Alacritty's `[colors.*]` block is the source of
+truth; everything else inherits.
+
+| Tool         | Where set                          | How                                            |
+|--------------|------------------------------------|------------------------------------------------|
+| alacritty    | `mac/.alacritty.toml`, `linux/.alacritty.toml` | Library file, refreshed by `install.sh`. |
+| oh-my-posh   | `mac/.config/ohmyposh/zen.toml`    | Library file, refreshed by `install.sh`.       |
+| claude code  | `~/.claude/settings.json`          | Set `"theme": "dark-ansi"` (uses terminal ANSI). |
+| codex        | `~/.codex/config.toml`             | Add `[tui]` with `theme = "gruvbox-dark"` for syntax. TUI inherits ANSI. |
+| btop         | `~/.config/btop/btop.conf`         | Set `color_theme = "TTY"` to inherit ANSI.     |
+
+The last three live outside the repo (their tools rewrite them) — set them
+once on a fresh machine.
+
 ## Why not GNU Stow / symlinks?
 
 Symlinking `~/.bashrc` into the repo means every local edit (PATH for a new

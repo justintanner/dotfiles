@@ -25,37 +25,71 @@ family = "JetBrainsMono Nerd Font"
 
 [font]
 size = 19
-# THEME_START
-# Colors (PaperColor - Light)
 
-# Default colors
+# Gas City — warm-dark palette. Source of truth for ANSI colors used by
+# claude code (dark-ansi), codex TUI, btop (TTY theme), and oh-my-posh.
 [colors.primary]
-background = '#eeeeee'
-foreground = '#444444'
+background = "#1e150e"
+foreground = "#e8d4a8"
+dim_foreground = "#a89074"
+bright_foreground = "#fce8c8"
 
 [colors.cursor]
-text = '#eeeeee'
-cursor = '#444444'
+text = "#1e150e"
+cursor = "#e0a060"
 
-# Normal colors
+[colors.vi_mode_cursor]
+text = "#1e150e"
+cursor = "#7fa9a9"
+
+[colors.search.matches]
+foreground = "#1e150e"
+background = "#a8804a"
+
+[colors.search.focused_match]
+foreground = "#1e150e"
+background = "#e0a060"
+
+[colors.footer_bar]
+foreground = "#e8d4a8"
+background = "#3d2e20"
+
+[colors.hints.start]
+foreground = "#1e150e"
+background = "#e08652"
+
+[colors.hints.end]
+foreground = "#e8d4a8"
+background = "#3d2e20"
+
+[colors.selection]
+text = "#e8d4a8"
+background = "#4a3520"
+
 [colors.normal]
-black   = '#eeeeee'
-red     = '#af0000'
-green   = '#008700'
-yellow  = '#5f8700'
-blue    = '#0087af'
-magenta = '#878787'
-cyan    = '#005f87'
-white   = '#444444'
+black = "#2a1f15"
+red = "#cc6e3a"
+green = "#8a9a5b"
+yellow = "#e0a060"
+blue = "#5b85a8"
+magenta = "#c4806c"
+cyan = "#7fa9a9"
+white = "#e8d4a8"
 
-# Bright colors
 [colors.bright]
-black   = '#bcbcbc'
-red     = '#d70000'
-green   = '#d70087'
-yellow  = '#8700af'
-blue    = '#d75f00'
-magenta = '#d75f00'
-cyan    = '#005faf'
-white   = '#005f87'
-# THEME_END
+black = "#3d2e20"
+red = "#e08652"
+green = "#a8b878"
+yellow = "#f0b870"
+blue = "#7ba5c8"
+magenta = "#d8a090"
+cyan = "#9fc4c4"
+white = "#fce8c8"
+
+[[colors.indexed_colors]]
+index = 16
+color = "#e08652"
+
+[[colors.indexed_colors]]
+index = 17
+color = "#c4806c"

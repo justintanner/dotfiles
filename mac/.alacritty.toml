@@ -25,68 +25,71 @@ family = "JetBrainsMono Nerd Font"
 
 [font]
 size = 18
+
+# Gas City — warm-dark palette. Source of truth for ANSI colors used by
+# claude code (dark-ansi), codex TUI, btop (TTY theme), and oh-my-posh.
 [colors.primary]
-background = "#eff1f5"
-foreground = "#4c4f69"
-dim_foreground = "#8c8fa1"
-bright_foreground = "#4c4f69"
+background = "#1e150e"
+foreground = "#e8d4a8"
+dim_foreground = "#a89074"
+bright_foreground = "#fce8c8"
 
 [colors.cursor]
-text = "#eff1f5"
-cursor = "#dc8a78"
+text = "#1e150e"
+cursor = "#e0a060"
 
 [colors.vi_mode_cursor]
-text = "#eff1f5"
-cursor = "#7287fd"
+text = "#1e150e"
+cursor = "#7fa9a9"
 
 [colors.search.matches]
-foreground = "#eff1f5"
-background = "#6c6f85"
+foreground = "#1e150e"
+background = "#a8804a"
 
 [colors.search.focused_match]
-foreground = "#eff1f5"
-background = "#40a02b"
+foreground = "#1e150e"
+background = "#e0a060"
 
 [colors.footer_bar]
-foreground = "#eff1f5"
-background = "#6c6f85"
+foreground = "#e8d4a8"
+background = "#3d2e20"
 
 [colors.hints.start]
-foreground = "#eff1f5"
-background = "#df8e1d"
+foreground = "#1e150e"
+background = "#e08652"
 
 [colors.hints.end]
-foreground = "#eff1f5"
-background = "#6c6f85"
+foreground = "#e8d4a8"
+background = "#3d2e20"
 
 [colors.selection]
-text = "#eff1f5"
-background = "#dc8a78"
+text = "#e8d4a8"
+background = "#4a3520"
 
 [colors.normal]
-black = "#bcc0cc"
-red = "#d20f39"
-green = "#40a02b"
-yellow = "#df8e1d"
-blue = "#1e66f5"
-magenta = "#ea76cb"
-cyan = "#179299"
-white = "#5c5f77"
+black = "#2a1f15"
+red = "#cc6e3a"
+green = "#8a9a5b"
+yellow = "#e0a060"
+blue = "#5b85a8"
+magenta = "#c4806c"
+cyan = "#7fa9a9"
+white = "#e8d4a8"
 
 [colors.bright]
-black = "#acb0be"
-red = "#d20f39"
-green = "#40a02b"
-yellow = "#df8e1d"
-blue = "#1e66f5"
-magenta = "#ea76cb"
-cyan = "#179299"
-white = "#6c6f85"
+black = "#3d2e20"
+red = "#e08652"
+green = "#a8b878"
+yellow = "#f0b870"
+blue = "#7ba5c8"
+magenta = "#d8a090"
+cyan = "#9fc4c4"
+white = "#fce8c8"
 
 [[colors.indexed_colors]]
 index = 16
-color = "#fe640b"
+color = "#e08652"
 
 [[colors.indexed_colors]]
 index = 17
-color = "#dc8a78"
+color = "#c4806c"
