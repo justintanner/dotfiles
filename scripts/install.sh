@@ -48,6 +48,7 @@ LIBRARY_FILES=(
   .alacritty.toml
   .inputrc
   .emacs
+  .tmux.conf
 )
 
 # Copy-once files; preserved across reinstalls (your edits live here).
