@@ -52,6 +52,19 @@ truth; everything else inherits.
 The last three live outside the repo (their tools rewrite them) — set them
 once on a fresh machine.
 
+Sibling palettes for Apple's built-in terminals live in `mac/themes/`:
+
+| File                                   | App           | Look                                           |
+|----------------------------------------|---------------|------------------------------------------------|
+| `gas-city-twilight.terminal`           | Terminal.app  | Chocolate-warm dark (`#5c3e22`), JetBrains Mono Nerd Font @ 22pt. |
+| `gas-city-espresso.itermcolors`        | iTerm2        | Espresso (`#2e1e10`), between Alacritty's walnut and Twilight. |
+
+Import via the app's UI (Terminal → Settings → Profiles → ⋯ → Import;
+iTerm2 → Settings → Profiles → Colors → Color Presets → Import). They
+aren't auto-installed — Terminal/iTerm own their preference stores.
+Regenerate after palette tweaks with
+`swift scripts/generate-mac-themes.swift`.
+
 ## Why not GNU Stow / symlinks?
 
 Symlinking `~/.bashrc` into the repo means every local edit (PATH for a new
@@ -72,10 +85,12 @@ dotfiles/
 │   ├── .gitignore_global
 │   ├── .alacritty.toml
 │   ├── .inputrc
-│   └── .config/ohmyposh/zen.toml
+│   ├── .config/ohmyposh/zen.toml
+│   └── themes/            # Terminal.app / iTerm2 palettes (manual import)
 ├── linux/                 # mirror of mac/ for Debian/Ubuntu
 ├── scripts/
-│   └── install.sh
+│   ├── install.sh
+│   └── generate-mac-themes.swift
 ├── Dockerfile             # ubuntu:24.04 sandbox for testing the linux/ tree
 ├── build.sh
 └── test-dotfiles.sh       # build + verify install.sh inside the sandbox
