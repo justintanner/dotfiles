@@ -30,7 +30,7 @@ repo — pull updates manually with `git -C ~/.emacs.d pull`).
 
 | Class        | Files                                                                                          | Behavior                                                |
 |--------------|------------------------------------------------------------------------------------------------|---------------------------------------------------------|
-| **library**  | `.bash_init`, `.bash_aliases`, `.gitconfig`, `.gitignore_global`, `.alacritty.toml`, `.inputrc`| Repo is source of truth. **Always overwritten** on install. |
+| **library**  | `.bash_init`, `.bash_aliases`, `.gitconfig`, `.gitignore_global`, `.alacritty.toml`, `.inputrc`, `.emacs`| Repo is source of truth. **Always overwritten** on install. |
 | **local-edit** | `.bashrc`, `.bash_profile`                                                                   | **Copy-once.** Yours after first install. Use `--force` to replace. |
 
 The shipped `~/.bashrc` is intentionally tiny: it sources `~/.bash_init` and

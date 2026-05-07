@@ -47,6 +47,7 @@ LIBRARY_FILES=(
   .gitignore_global
   .alacritty.toml
   .inputrc
+  .emacs
 )
 
 # Copy-once files; preserved across reinstalls (your edits live here).
