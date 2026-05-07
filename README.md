@@ -16,6 +16,10 @@ The installer detects macOS or Linux and copies the matching tree (`mac/` or
 `linux/`) into `$HOME`. Existing real files are backed up to
 `~/.dotfiles_backup/<timestamp>/`. Re-running the script is safe.
 
+It also clones [`justintanner/.emacs.d`](https://github.com/justintanner/.emacs.d)
+into `~/.emacs.d` on first install (skipped if the directory is already a git
+repo — pull updates manually with `git -C ~/.emacs.d pull`).
+
 ```bash
 ./scripts/install.sh             # install / refresh
 ./scripts/install.sh --force     # also overwrite ~/.bashrc and ~/.bash_profile
@@ -89,7 +93,7 @@ dotfiles/
 │   └── themes/            # Terminal.app / iTerm2 palettes (manual import)
 ├── linux/                 # mirror of mac/ for Debian/Ubuntu
 ├── scripts/
-│   ├── install.sh
+│   ├── install.sh             # also clones ~/.emacs.d on first run
 │   └── generate-mac-themes.swift
 ├── Dockerfile             # ubuntu:24.04 sandbox for testing the linux/ tree
 ├── build.sh

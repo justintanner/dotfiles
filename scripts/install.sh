@@ -60,6 +60,10 @@ CONFIG_DIRS=(
   ohmyposh
 )
 
+# Emacs config — checked out as a sibling git repo, not copied. Updates flow
+# through `git pull` in ~/.emacs.d, not the installer.
+EMACS_D_REPO="https://github.com/justintanner/.emacs.d"
+
 run() {
   if [[ "$DRY_RUN" -eq 1 ]]; then
     echo "  [dry-run] $*"
@@ -152,6 +156,20 @@ install_config_dir() {
   echo "  installed (config)  .config/$name"
 }
 
+clone_emacs_d() {
+  local target="$HOME/.emacs.d"
+  if [[ -d "$target/.git" ]]; then
+    echo "  exists    .emacs.d  (skipped clone; pull manually if needed)"
+    return 0
+  fi
+  if [[ -e "$target" ]]; then
+    backup_one "$target"
+    run "rm -rf '$target'"
+  fi
+  run "git clone '$EMACS_D_REPO' '$target'"
+  echo "  cloned    .emacs.d  <- $EMACS_D_REPO"
+}
+
 echo "Dotfiles install"
 echo "  source:  $PLATFORM_DIR"
 echo "  target:  $HOME"
@@ -163,6 +181,7 @@ echo
 for f in "${LIBRARY_FILES[@]}";    do install_library_file "$f";    done
 for f in "${LOCAL_EDIT_FILES[@]}"; do install_local_edit_file "$f"; done
 for d in "${CONFIG_DIRS[@]}";      do install_config_dir "$d";      done
+clone_emacs_d
 
 echo
 echo "Done."
