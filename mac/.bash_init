@@ -2,7 +2,17 @@
 
 # =============================================================================
 # Bash Initialization - Advanced Configuration
+#
+# Repo-managed (~/dotfiles/mac/.bash_init). Refreshed every install.sh run.
+# Don't add machine-specific or secret config here — use ~/.bashrc instead.
 # =============================================================================
+
+# -----------------------------------------------------------------------------
+# Editor / Locale
+# -----------------------------------------------------------------------------
+export EDITOR="emacs"
+export SUDO_EDITOR="$EDITOR"
+export LC_ALL=en_US.UTF-8
 
 # -----------------------------------------------------------------------------
 # History Configuration
@@ -19,7 +29,7 @@ HISTFILESIZE="${HISTSIZE}"
 export BASH_SILENCE_DEPRECATION_WARNING=1
 
 # Add Homebrew to the path (before system paths for newer versions)
-export PATH="/usr/local/bin:/usr/local/sbin:/opt/homebrew/bin:/opt/homebrew/sbin:$PATH"
+export PATH="/usr/local/bin:/usr/local/sbin:/opt/homebrew/bin:/opt/homebrew/sbin:$HOME/go/bin:$PATH"
 
 # MySQL client build support
 if [ -d "/opt/homebrew/opt/mysql-client" ]; then
@@ -46,7 +56,7 @@ fi
 # Path Configuration
 # -----------------------------------------------------------------------------
 # Add local bins to path
-export PATH="./bin:~/.local/bin:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # -----------------------------------------------------------------------------
 # Environment Variables

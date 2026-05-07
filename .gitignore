@@ -1,18 +1,18 @@
 # macOS
 .DS_Store
+**/.DS_Store
 
 # Backup files
 *.backup
 *.bak
 *.tmp
 
-# Local configuration
-*.local
-
 # Editor files
 *.swp
 *.swo
 *~
+\#*\#
+.\#*
 
 # Logs
 *.log

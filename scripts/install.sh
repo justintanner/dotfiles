@@ -1,185 +1,171 @@
 #!/usr/bin/env bash
+# Install dotfiles by copying real files into $HOME (no symlinks, no stow).
+#
+# Two file classes:
+#   library    — repo is source of truth; always refreshed on install.
+#   local-edit — copied only on first install (or with --force). Yours after.
+#
+# Usage:
+#   ./install.sh             # install / refresh
+#   ./install.sh --force     # also overwrite local-edit files (.bashrc, ...)
+#   ./install.sh --dry-run   # show what would happen, change nothing
 
-set -e
+set -euo pipefail
 
-DOTFILES_DIR="$HOME/dotfiles"
+DOTFILES_DIR="${DOTFILES_DIR:-$HOME/dotfiles}"
+TIMESTAMP="$(date +%Y%m%d_%H%M%S)"
+BACKUP_DIR="$HOME/.dotfiles_backup/$TIMESTAMP"
+FORCE=0
+DRY_RUN=0
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-
-print_success() {
-    echo -e "${GREEN}✓${NC} $1"
+usage() {
+  sed -n '2,12p' "$0"
 }
 
-print_error() {
-    echo -e "${RED}✗${NC} $1"
-}
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    -f|--force)   FORCE=1; shift ;;
+    -n|--dry-run) DRY_RUN=1; shift ;;
+    -h|--help)    usage; exit 0 ;;
+    *) echo "unknown arg: $1" >&2; usage; exit 2 ;;
+  esac
+done
 
-print_info() {
-    echo -e "${YELLOW}→${NC} $1"
-}
+case "$(uname -s)" in
+  Darwin) PLATFORM_DIR="$DOTFILES_DIR/mac" ;;
+  Linux)  PLATFORM_DIR="$DOTFILES_DIR/linux" ;;
+  *) echo "Unsupported OS: $(uname -s)" >&2; exit 1 ;;
+esac
 
-# Check if running on macOS
-if [[ "$(uname)" != "Darwin" ]]; then
-    print_error "This installer is for macOS only"
-    exit 1
-fi
+[[ -d "$PLATFORM_DIR" ]] || { echo "Missing platform dir: $PLATFORM_DIR" >&2; exit 1; }
 
-print_info "Starting dotfiles installation..."
-
-# Install Homebrew if not installed
-if ! command -v brew &> /dev/null; then
-    print_info "Installing Homebrew..."
-    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    # Add Homebrew to PATH for this session
-    if [[ -f "/opt/homebrew/bin/brew" ]]; then
-        eval "$(/opt/homebrew/bin/brew shellenv)"
-    fi
-else
-    print_success "Homebrew already installed"
-fi
-
-# Update Homebrew
-print_info "Updating Homebrew..."
-brew update
-
-# Install essential packages
-print_info "Installing essential packages..."
-
-PACKAGES=(
-    "stow"           # Symlink manager
-    "git"            # Version control
-    "bash"           # Latest bash
-    "bash-completion" # Bash completions
-    "mise"           # Runtime version manager
-    "alacritty"      # Terminal emulator
-    "bat"            # Better cat
-    "eza"            # Better ls
-    "ripgrep"        # Better grep
-    "fd"             # Better find
-    "gh"             # GitHub CLI
-    "jq"             # JSON processor
-    "tree"           # Directory tree
-    "wget"           # Download utility
-    "curl"           # Transfer utility
+# Repo source-of-truth files; always overwrite on install.
+LIBRARY_FILES=(
+  .bash_init
+  .bash_aliases
+  .gitconfig
+  .gitignore_global
+  .alacritty.toml
+  .inputrc
 )
 
-for package in "${PACKAGES[@]}"; do
-    if brew list "$package" &>/dev/null; then
-        print_success "$package already installed"
-    else
-        print_info "Installing $package..."
-        brew install "$package"
-        print_success "$package installed"
-    fi
-done
+# Copy-once files; preserved across reinstalls (your edits live here).
+LOCAL_EDIT_FILES=(
+  .bashrc
+  .bash_profile
+)
 
-# Install fonts
-print_info "Installing JetBrains Mono Nerd Font..."
-brew tap homebrew/cask-fonts 2>/dev/null || true
-if brew list --cask font-jetbrains-mono-nerd-font &>/dev/null; then
-    print_success "JetBrains Mono Nerd Font already installed"
-else
-    brew install --cask font-jetbrains-mono-nerd-font
-    print_success "JetBrains Mono Nerd Font installed"
-fi
+# Optional .config/* dirs to mirror under ~/.config.
+CONFIG_DIRS=(
+  ohmyposh
+)
 
-# Clone or update dotfiles repository
-if [[ ! -d "$DOTFILES_DIR" ]]; then
-    print_error "Dotfiles directory not found at $DOTFILES_DIR"
-    print_info "Please clone the dotfiles repository first:"
-    echo "  git clone <your-dotfiles-repo> $DOTFILES_DIR"
-    exit 1
-fi
-
-# Backup existing dotfiles
-print_info "Backing up existing dotfiles..."
-mkdir -p "$HOME/.dotfiles_backup"
-
-backup_file() {
-    local file="$1"
-    if [[ -e "$HOME/$file" && ! -L "$HOME/$file" ]]; then
-        mv "$HOME/$file" "$HOME/.dotfiles_backup/$(basename $file).$(date +%Y%m%d_%H%M%S)"
-        print_info "Backed up $file"
-    fi
+run() {
+  if [[ "$DRY_RUN" -eq 1 ]]; then
+    echo "  [dry-run] $*"
+  else
+    eval "$@"
+  fi
 }
 
-# Backup common dotfiles
-backup_file ".bashrc"
-backup_file ".bash_profile"
-backup_file ".bash_aliases"
-backup_file ".gitconfig"
-backup_file ".gitignore_global"
-backup_file ".alacritty.toml"
+backup_one() {
+  local target="$1"
+  if [[ -e "$target" || -L "$target" ]]; then
+    run "mkdir -p '$BACKUP_DIR'"
+    run "cp -aP '$target' '$BACKUP_DIR/' 2>/dev/null || true"
+  fi
+}
 
-# Use GNU Stow to create symlinks
-print_info "Creating symlinks with Stow..."
+# Returns 0 if $target is a symlink that points into ~/dotfiles.
+is_dotfiles_symlink() {
+  local target="$1"
+  [[ -L "$target" ]] || return 1
+  local link
+  link="$(readlink "$target")"
+  case "$link" in
+    */dotfiles/*|dotfiles/*|"$DOTFILES_DIR"/*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
 
-cd "$DOTFILES_DIR"
+# Remove a symlink at $target only if it points into ~/dotfiles. Real files
+# are left alone here — backup_one + cp -f handles those.
+remove_dotfiles_symlink() {
+  local target="$1"
+  if is_dotfiles_symlink "$target"; then
+    run "rm -f '$target'"
+  fi
+}
 
-# Stow packages
-STOW_PACKAGES=("alacritty" "bash" "git")
+install_library_file() {
+  local file="$1"
+  local src="$PLATFORM_DIR/$file"
+  local dst="$HOME/$file"
+  [[ -f "$src" ]] || return 0
+  remove_dotfiles_symlink "$dst"
+  if [[ -f "$dst" && ! -L "$dst" ]]; then
+    backup_one "$dst"
+  fi
+  run "cp -f '$src' '$dst'"
+  echo "  installed (library) $file"
+}
 
-for package in "${STOW_PACKAGES[@]}"; do
-    if [[ -d "$package" ]]; then
-        print_info "Stowing $package..."
-        stow -v --restow --target="$HOME" "$package"
-        print_success "$package stowed"
-    else
-        print_error "Package directory $package not found"
-    fi
-done
+install_local_edit_file() {
+  local file="$1"
+  local src="$PLATFORM_DIR/$file"
+  local dst="$HOME/$file"
+  [[ -f "$src" ]] || return 0
 
-# Stow mise if directory exists
-if [[ -d "mise" ]]; then
-    print_info "Stowing mise configuration..."
-    mkdir -p "$HOME/.config"
-    stow -v --restow --target="$HOME/.config" --dir="$DOTFILES_DIR/mise" .
-    print_success "mise configuration stowed"
+  # If $dst is a symlink into ~/dotfiles, it's a leftover from the old
+  # symlink-based setup; treat it as if no real file exists yet so we
+  # write the fresh template.
+  local was_dotfiles_symlink=0
+  if is_dotfiles_symlink "$dst"; then
+    was_dotfiles_symlink=1
+    remove_dotfiles_symlink "$dst"
+  fi
+
+  if [[ -e "$dst" && "$was_dotfiles_symlink" -ne 1 && "$FORCE" -ne 1 ]]; then
+    echo "  kept     (local)   $file  (use --force to overwrite)"
+    return 0
+  fi
+  if [[ -e "$dst" ]]; then
+    backup_one "$dst"
+  fi
+  run "cp -f '$src' '$dst'"
+  echo "  installed (local)   $file"
+}
+
+install_config_dir() {
+  local name="$1"
+  local src="$PLATFORM_DIR/.config/$name"
+  local dst="$HOME/.config/$name"
+  [[ -d "$src" ]] || return 0
+  run "mkdir -p '$HOME/.config'"
+  if [[ -L "$dst" ]]; then
+    remove_dotfiles_symlink "$dst"
+  elif [[ -d "$dst" ]]; then
+    backup_one "$dst"
+    run "rm -rf '$dst'"
+  fi
+  run "cp -R '$src' '$dst'"
+  echo "  installed (config)  .config/$name"
+}
+
+echo "Dotfiles install"
+echo "  source:  $PLATFORM_DIR"
+echo "  target:  $HOME"
+echo "  backup:  $BACKUP_DIR (only if needed)"
+[[ "$FORCE"   -eq 1 ]] && echo "  --force: local-edit files WILL be overwritten"
+[[ "$DRY_RUN" -eq 1 ]] && echo "  --dry-run: no changes will be made"
+echo
+
+for f in "${LIBRARY_FILES[@]}";    do install_library_file "$f";    done
+for f in "${LOCAL_EDIT_FILES[@]}"; do install_local_edit_file "$f"; done
+for d in "${CONFIG_DIRS[@]}";      do install_config_dir "$d";      done
+
+echo
+echo "Done."
+if [[ -d "$BACKUP_DIR" ]]; then
+  echo "Backups saved to $BACKUP_DIR"
 fi
-
-# Add bin directory to PATH if it exists
-if [[ -d "$DOTFILES_DIR/bin" ]]; then
-    print_success "bin directory found - will be added to PATH via .bashrc"
-fi
-
-# Set up default shell
-print_info "Setting up default shell..."
-BREW_BASH="/opt/homebrew/bin/bash"
-if [[ -f "$BREW_BASH" ]]; then
-    # Add Homebrew bash to allowed shells if not already there
-    if ! grep -q "$BREW_BASH" /etc/shells; then
-        print_info "Adding $BREW_BASH to /etc/shells..."
-        echo "$BREW_BASH" | sudo tee -a /etc/shells > /dev/null
-    fi
-
-    # Ask if user wants to change default shell
-    read -p "Do you want to set $BREW_BASH as your default shell? (y/n) " -n 1 -r
-    echo
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-        chsh -s "$BREW_BASH"
-        print_success "Default shell changed to $BREW_BASH"
-    fi
-else
-    print_error "Homebrew bash not found at $BREW_BASH"
-fi
-
-print_success "Dotfiles installation complete!"
-print_info "Please restart your terminal or run: source ~/.bashrc"
-
-# Final instructions
-echo ""
-echo "Next steps:"
-echo "1. Configure git with your name and email:"
-echo "   git config --global user.name \"Your Name\""
-echo "   git config --global user.email \"your.email@example.com\""
-echo ""
-echo "2. Install Ruby using mise:"
-echo "   mise use --global ruby@3.3"
-echo ""
-echo "3. Customize your local settings by creating:"
-echo "   ~/.bashrc.local"

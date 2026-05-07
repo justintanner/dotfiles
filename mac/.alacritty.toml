@@ -24,7 +24,7 @@ history = 10000
 family = "JetBrainsMono Nerd Font"
 
 [font]
-size = 19
+size = 18
 [colors.primary]
 background = "#eff1f5"
 foreground = "#4c4f69"

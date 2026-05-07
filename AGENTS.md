@@ -1,27 +1,40 @@
 # AGENTS.md
 
-Guidance for coding agents working with this dotfiles repository.
+Guidance for coding agents working in this dotfiles repo.
+
+## Install model
+
+`scripts/install.sh` copies real files from `mac/` or `linux/` into `$HOME`.
+No symlinks, no GNU Stow. Two file classes:
+
+- **library** (always overwritten): `.bash_init`, `.bash_aliases`,
+  `.gitconfig`, `.gitignore_global`, `.alacritty.toml`, `.inputrc`.
+- **local-edit** (copy-once, preserved across reinstalls): `.bashrc`,
+  `.bash_profile`.
+
+Files that should ship to all machines via the repo are **library**.
+Files the user/LLM is expected to edit per-machine are **local-edit**.
 
 ## Commands
 
-- **Setup:** `stow mac` (macOS) or `stow linux` (Linux) - Symlink platform-specific dotfiles
-- **Uninstall:** `stow -D mac` or `stow -D linux` - Remove symlinks
-- **Restow:** `stow --restow mac` or `stow --restow linux` - Refresh symlinks
-- **Preview:** `stow -n -v mac` or `stow -n -v linux` - Dry run with verbose output
-- **Adopt:** `stow --adopt mac` or `stow --adopt linux` - Incorporate existing files
-- **Full install:** `scripts/install.sh` (macOS only) - Complete environment setup
+- `./scripts/install.sh` — install / refresh
+- `./scripts/install.sh --force` — overwrite local-edit files too
+- `./scripts/install.sh --dry-run` — preview, no changes
+- `./test-dotfiles.sh` — docker sandbox for linux/
 
-## Repository Structure
+## Editing rules
 
-- `mac/` - macOS-specific dotfiles (.bashrc, .bash_profile, .alacritty.toml, .gitconfig, etc.)
-- `linux/` - Linux-specific dotfiles (.bashrc, .alacritty.toml, .gitconfig, etc.)
-- `scripts/` - Helper scripts including full macOS installation script
-- `CLAUDE.md` - Detailed documentation for Claude Code usage
+- Shared shell config (PATH defaults, mise/zoxide/fzf init, locale, prompt)
+  goes in `mac/.bash_init` or `linux/.bash_init`. **Never** in `.bashrc`.
+- The `mac/.bashrc` and `linux/.bashrc` templates ship with empty LOCAL
+  CUSTOMIZATIONS and SECRETS sections. Keep them empty in the repo.
+- This repo is public on GitHub. Never commit secrets. Run
+  `git diff --cached` looking for `ops_eyJ`, `sk-`, `ghp_`, etc., before
+  every commit.
 
-## Code Style
+## Code style
 
-- Shell scripts use `#!/usr/bin/env bash` shebang
-- Variables in ALL_CAPS for constants, lowercase for locals
-- Use double quotes for variables, single quotes for literal strings
-- Platform detection with `if [[ "$OSTYPE" == "darwin"* ]]`
-- Files follow standard dotfile conventions (hidden files starting with `.`)
+- `#!/usr/bin/env bash` shebang, `set -euo pipefail` in install scripts.
+- Quote variables; single-quote literal strings.
+- Platform detection: `case "$(uname -s)" in Darwin|Linux) ... esac`.
+- Keep `mac/` and `linux/` layouts mirrored when adding files.

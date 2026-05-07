@@ -1,153 +1,82 @@
 # Dotfiles
 
-Cross-platform dotfiles managed with [GNU Stow](https://www.gnu.org/software/stow/), supporting both macOS and Linux.
+Cross-platform dotfiles for macOS and Linux. **Real files, not symlinks** —
+`scripts/install.sh` copies them into `$HOME` so machine-specific edits don't
+leak back into a public git repo.
 
-## Installation
+## Quick start
 
-### Prerequisites
-
-Install GNU Stow:
 ```bash
-# macOS (via Homebrew)
-brew install stow
-
-# Linux (Debian/Ubuntu)
-apt-get install stow
-
-# Linux (Fedora)
-dnf install stow
-
-# Linux (Arch)
-pacman -S stow
-```
-
-### Setup
-
-1. Clone repository to home directory:
-```bash
-git clone https://github.com/yourusername/dotfiles.git ~/dotfiles
+git clone https://github.com/justintanner/dotfiles.git ~/dotfiles
 cd ~/dotfiles
+./scripts/install.sh
 ```
 
-2. Stow platform-specific configurations:
+The installer detects macOS or Linux and copies the matching tree (`mac/` or
+`linux/`) into `$HOME`. Existing real files are backed up to
+`~/.dotfiles_backup/<timestamp>/`. Re-running the script is safe.
 
-**For macOS:**
 ```bash
-stow mac
+./scripts/install.sh             # install / refresh
+./scripts/install.sh --force     # also overwrite ~/.bashrc and ~/.bash_profile
+./scripts/install.sh --dry-run   # show what would change
 ```
 
-**For Linux:**
-```bash
-stow linux
-```
+## Two classes of files
 
-## Structure
+| Class        | Files                                                                                          | Behavior                                                |
+|--------------|------------------------------------------------------------------------------------------------|---------------------------------------------------------|
+| **library**  | `.bash_init`, `.bash_aliases`, `.gitconfig`, `.gitignore_global`, `.alacritty.toml`, `.inputrc`| Repo is source of truth. **Always overwritten** on install. |
+| **local-edit** | `.bashrc`, `.bash_profile`                                                                   | **Copy-once.** Yours after first install. Use `--force` to replace. |
+
+The shipped `~/.bashrc` is intentionally tiny: it sources `~/.bash_init` and
+`~/.bash_aliases`, then leaves two clearly-marked sections for you (and any
+LLM editing your shell config) to drop machine-specific PATH entries,
+exports, and secrets into. The repo's `mac/.bashrc` template ships with
+those sections empty — your real `~/.bashrc` is never tracked.
+
+## Why not GNU Stow / symlinks?
+
+Symlinking `~/.bashrc` into the repo means every local edit (PATH for a new
+tool, an API token an agent pasted in) becomes a pending git change. One
+absent-minded `git commit -a` and your secrets are on a public remote. The
+copy-based install severs that link by design.
+
+## Layout
 
 ```
 dotfiles/
-├── mac/                 # macOS-specific dotfiles
-│   ├── .alacritty.toml
-│   ├── .bashrc
+├── mac/
+│   ├── .bashrc            # template (LLM banner + LOCAL/SECRETS sections)
 │   ├── .bash_profile
+│   ├── .bash_init
 │   ├── .bash_aliases
 │   ├── .gitconfig
-│   └── .gitignore_global
-├── linux/               # Linux-specific dotfiles
+│   ├── .gitignore_global
 │   ├── .alacritty.toml
-│   ├── .bashrc
-│   ├── .bash_aliases
-│   ├── .gitconfig
-│   └── .gitignore_global
-├── scripts/             # Helper scripts
-├── README.md
-└── CLAUDE.md
+│   ├── .inputrc
+│   └── .config/ohmyposh/zen.toml
+├── linux/                 # mirror of mac/ for Debian/Ubuntu
+├── scripts/
+│   └── install.sh
+├── Dockerfile             # ubuntu:24.04 sandbox for testing the linux/ tree
+├── build.sh
+└── test-dotfiles.sh       # build + verify install.sh inside the sandbox
 ```
 
-## Usage
+## Adding a new dotfile to the repo
 
-### Managing Dotfiles
+1. Copy your real file into `mac/` and/or `linux/`.
+2. Add the basename to `LIBRARY_FILES` (always-overwrite) or
+   `LOCAL_EDIT_FILES` (copy-once) in `scripts/install.sh`.
+3. Run `./scripts/install.sh` to verify.
+
+## Testing the linux/ tree in Docker
 
 ```bash
-# Stow platform configs
-stow mac      # macOS
-stow linux    # Linux
-
-# Remove symlinks
-stow -D mac
-stow -D linux
-
-# Restow (refresh) symlinks
-stow --restow mac
-stow --restow linux
-
-# Dry run (preview changes)
-stow -n -v mac
-stow -n -v linux
-
-# Adopt existing files
-stow --adopt mac
-stow --adopt linux
+./build.sh           # build the image
+./test-dotfiles.sh   # menu: shell / verify / both
 ```
 
-### Adding New Dotfiles
-
-**For macOS:**
-```bash
-cp ~/.vimrc ~/dotfiles/mac/.vimrc
-cd ~/dotfiles
-stow --restow mac
-```
-
-**For Linux:**
-```bash
-cp ~/.vimrc ~/dotfiles/linux/.vimrc
-cd ~/dotfiles
-stow --restow linux
-```
-
-### Automatic Platform Detection
-
-```bash
-# Install based on detected OS
-cd ~/dotfiles
-if [[ "$OSTYPE" == "darwin"* ]]; then
-    stow mac
-else
-    stow linux
-fi
-```
-
-## Platform Differences
-
-### macOS (`mac/`)
-- Includes `.bash_profile` for Terminal.app compatibility
-- Homebrew configuration in `.bashrc`
-- macOS-specific color settings
-
-### Linux (`linux/`)
-- No `.bash_profile` (uses `.bashrc` directly)
-- Linux-specific color support with dircolors
-- No Homebrew configuration
-
-## Troubleshooting
-
-### Check for conflicts
-```bash
-stow -n -v mac 2>&1 | grep -E 'CONFLICT|WARNING'
-stow -n -v linux 2>&1 | grep -E 'CONFLICT|WARNING'
-```
-
-### Force adoption of existing files
-```bash
-stow --adopt mac    # macOS
-stow --adopt linux  # Linux
-```
-
-### Clean and restow
-```bash
-# macOS
-stow -D mac && stow mac
-
-# Linux
-stow -D linux && stow linux
-```
+The verify mode confirms `~/.bashrc` and friends are real files (not
+symlinks) and that mise/Ruby/Node/oh-my-posh come up cleanly.
